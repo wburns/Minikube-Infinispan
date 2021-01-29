@@ -1,0 +1,10 @@
+apiVersion: infinispan.org/v1
+kind: Infinispan
+metadata:
+  name: infinispan-cluster
+  namespace: infinispan
+spec:
+  replicas: 3
+  expose:
+    type: NodePort
+    nodePort: 30001
