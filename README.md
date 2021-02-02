@@ -50,13 +50,13 @@ spec:
     nodePort: 30000
 ```
 
+You also will need to create an infinispan namespace. You can also do this via yaml if desired.
+
+`kubectl create namespace infinispan`
+
 Creates a cluster of 3 nodes in the infinispan namespace exposed at port 30001
 
 `kubectl apply -f infinispan-cluster.yaml`
-
-You also will probably need to create an infinispan namespace. You can also do this via yaml if desired.
-
-`kubectl create namespace infinispan`
 
 Note that depending upon the version the Infinispan operator may not be monitoring other namespaces. I need to figure out how to configure this with the operator hub Subscription CR still.
 
@@ -130,6 +130,8 @@ spec:
   serviceMonitorSelector: {}
 ```
 
+If for some reason it failed, try to delete the pod `kubectl delete pod prometheus-operator-<RANDOM_NAME> -n operators` and rerun the command above 
+
 ## Add a service monitor to monitor the Infinispan nodes
 
 Make sure the secret matches the login for the Infinispan secret.
@@ -198,7 +200,10 @@ You can take an example from operator hub
 
 I used grafana-cr.yaml, note the user and password to login to the console
 
-`kubectl apply -f grafana-cr.yaml`
+```
+kubectl create namespace grafana
+kubectl apply -f grafana-cr.yaml
+```
 
 ## Apply the NodePort for grafana to expose it
 See grafana-nodeport.yaml and add via `kubectl apply -f grafana-nodeport.yaml`
@@ -206,12 +211,19 @@ See grafana-nodeport.yaml and add via `kubectl apply -f grafana-nodeport.yaml`
 The grafana console should now be accesible via `http://<minikube-ip>:30901`
 The login for the security user and password in the previous step can be used to log in
 
+It can take some time to the `http://<minikube-ip>:30901` be available. 
+
 ## setup grafana
-We now need to add a datasource for Grafana under Configuration
+We now need to add a datasource for Grafana under Configuration. Don't forget to login.
+
 Add a Prometheus data source
+
 For the URL I just put the exposed minikube ip and port from the node. Technically you can use the service exposed ip to the kubernetes cluster as well.
 
 ## Add your dashboard
 Infinispan will eventually install it automatically no matter the order, but that isn't in yet.
+You can import `dashboard.json`
 
+### Troubleshooting Dashboard
+If the values are not reported to the Dashboard, try hit the configuration dashboad button and submit the same in the variables form
 
